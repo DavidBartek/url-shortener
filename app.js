@@ -56,6 +56,11 @@ app.listen(port, () => {
     console.log(`URL shortener service running at http://localhost:${port}`);
 });
 
+setInterval(() => {
+    console.log("every second flush at", new Date().toISOString());
+    // flush logic
+}, 1000);
+
 // to test - in terminal:
 // POST (shorten a URL)
 // curl -X POST http://localhost:3000/api/urls/shorten \
