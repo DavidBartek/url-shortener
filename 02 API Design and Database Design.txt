@@ -1,0 +1,17 @@
+API Design
+
+create endpoint for each functional requirement:
+1. URL Shortening
+
+POST /api/urls/shorten
+Req: Long URL
+Res: Short URL
+
+2. URL Redirection
+
+GET /api/urls/{shortUrl} (best way to pass in, as GET has no body)
+Res: Redirect 302
+// 300-level is redirect
+// 301: browser saves this redirect to cache (no analytics)
+// 302: browser does NOT cache redirect (supports analytics)
+

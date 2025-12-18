@@ -1,0 +1,41 @@
+1. Ensure non-functional requirements are satisfied.
+
+* minimize redirect latency
+	* 10k RPS quite high for a single RDB
+		* index (PK) by short_url - makes Select _ Where faster
+		* however: single node DB likely just not ideal even with indexing
+	* Read-Replicas
+		* create replicas of DB that are read-only
+		* increases read throughput / decreases read latency
+	* Best: Cacheing
+		* cache most frequently used short URLs into a Redis Cache. URL Redirection Service first checks cache; if not available, checks database
+		* can handle significantly more throughput; significantly decreases latency (less requests hitting DB)
+	* Another good option, too complicated for this: Sharding
+
+* Analytics
+	* included in URL Redirection Service
+	* separate data store from main DB; could overload already read-heavy DB with lots of writes
+	* rather: in-memory store (Redis)
+	* periodically flush data to the main database (~1x/min)
+
+
+
+
+2. HOW to generate a unique short URLs
+
+* Counter data store - separate service - cache (e.g. Redis). URL Shortening Service makes request to Counter; counter increments for every url made
+	* Quick (single threaded; very low latency)
+	* Predictable
+	* downside: if counter goes down, entire app goes down
+	* solution: potentially replicate counter, with each having different counts (how to coordinate?)
+
+* Randomly generate strings
+	* biggest drawback: collisions
+	* implement retries against existing store in database
+	* low probability: 5B lifetime URLs, out of 56 B potential for 6-char
+	* adds ~500ms latency? not a terrible downside for end user
+
+* Hashing - MD5, SHA256
+	* hash will be longer than req chars; just chop off first or last 6 and make that the short url
+	* same issue as randomly generated strings: collisions
+	* same remedy: retry against DB

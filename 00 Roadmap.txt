@@ -1,0 +1,7 @@
+Problem statement: design a URL shortener service like bit.ly
+
+Steps:
+1. Gather requirements
+2. API design/database
+3. High-level design
+4. Deep dives
